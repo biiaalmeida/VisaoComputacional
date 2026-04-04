@@ -18,4 +18,4 @@ astar_tests: astar_tests.c
 	$(CC) $(CFLAGS) astar_tests.c -o astar_tests
 
 clean:
-	rm -f astar astar_tests
+	rm -f astar astar_tests main
