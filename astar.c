@@ -5,23 +5,23 @@
 #define TAM_FILA (ROW * COL)
 
 int grid[ROW][COL] = {
-    {0, 0, 0, 0, 0},
-    {0, -1, -1, 0, 0},
-    {0, 0, 0, -1, 0},
-    {0, -1, 0, 0, 0},
-    {0, -1, 0, -1, 0},
-    {0, 0, 0, -1, 0},
-    {-1, -1, 0, 0, 0},
-    {0, 0, 0, -1, 0},
-    {0, -1, 0, 0, 0},
-    {0, 0, 0, 0, 0}
+    { 0,  0,  0,  0,  0},
+    { 0, -1, -1,  0,  0},
+    { 0,  0,  0, -1,  0},
+    { 0, -1,  0,  0,  0},
+    { 0, -1,  0, -1,  0},
+    { 0,  0,  0, -1,  0},
+    {-1, -1,  0,  0,  0},
+    { 0,  0,  0, -1,  0},
+    { 0, -1,  0,  0,  0},
+    { 0,  0,  0,  0,  0}
 };
 
 // definir origem e destino explicitamente
-int linhaOrigem = 1;
-int colunaOrigem = 4;
-int linhaDestino = 9;
-int colunaDestino = 1;
+int linhaOrigem = 4;
+int colunaOrigem = 2;
+int linhaDestino = 0;
+int colunaDestino = 0;
 
 int dist[ROW][COL];
 int paiLinha[ROW][COL];
