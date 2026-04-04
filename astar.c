@@ -2,9 +2,10 @@
 
 #define ROW 10
 #define COL 5
+#define TAM_FILA (ROW * COL)
 
 int grid[ROW][COL] = {
-    {1, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0},
     {0, -1, -1, 0, 0},
     {0, 0, 0, -1, 0},
     {0, -1, 0, 0, 0},
@@ -16,46 +17,91 @@ int grid[ROW][COL] = {
     {0, 0, 0, 0, 0}
 };
 
-// destino 
+// definir origem e destino explicitamente
+int linhaOrigem = 1;
+int colunaOrigem = 4;
 int linhaDestino = 9;
-int colunaDestino = 4;
+int colunaDestino = 1;
+
+int dist[ROW][COL];
+int paiLinha[ROW][COL];
+int paiColuna[ROW][COL];
 
 // movimentos (considerando as diagonais)
 int movimentoLinha[]  = {-1, 1, 0, 0, -1, -1, 1, 1};
 int movimentoColuna[] = {0, 0, -1, 1, -1, 1, -1, 1};
 
-// encontra início
-void encontrarInicio(int *linhaInicial, int *colunaInicial) {
+// valida se origem e destino estão dentro da matriz e não são obstáculos
+int validarPontos() {
+
+    if (linhaOrigem < 0 || linhaOrigem >= ROW || colunaOrigem < 0 || colunaOrigem >= COL) {
+        printf("Erro: origem fora dos limites da matriz.\n");
+        return 0;
+    }
+
+    if (linhaDestino < 0 || linhaDestino >= ROW || colunaDestino < 0 || colunaDestino >= COL) {
+        printf("Erro: destino fora dos limites da matriz.\n");
+        return 0;
+    }
+
+    if (grid[linhaOrigem][colunaOrigem] == -1) {
+        printf("Erro: origem está sobre um obstáculo.\n");
+        return 0;
+    }
+
+    if (grid[linhaDestino][colunaDestino] == -1) {
+        printf("Erro: destino está sobre um obstáculo.\n");
+        return 0;
+    }
+
+    if (linhaOrigem == linhaDestino && colunaOrigem == colunaDestino) {
+        printf("Erro: origem e destino não podem ser o mesmo ponto.\n");
+        return 0;
+    }
+
+    return 1;
+}
+
+// prepara estruturas de busca
+void prepararBusca() {
 
     for (int i = 0; i < ROW; i++) {
         for (int j = 0; j < COL; j++) {
-            if (grid[i][j] == 1) {
-                *linhaInicial = i;
-                *colunaInicial = j;
-            }
+            dist[i][j] = -1;
+            paiLinha[i][j] = -1;
+            paiColuna[i][j] = -1;
         }
     }
+
+    dist[linhaOrigem][colunaOrigem] = 0;
+}
+
+// encontra início
+void encontrarInicio(int *linhaInicial, int *colunaInicial) {
+
+    *linhaInicial = linhaOrigem;
+    *colunaInicial = colunaOrigem;
 }
 
 // propagar valores
-void propagar(int linhaInicial, int colunaInicial) {
+int propagar(int linhaInicial, int colunaInicial) {
 
-    int filaLinha[100], filaColuna[100]; // filas para armazenar as posições a serem processadas
-    int inicioFila = 0, fimFila = 0;// índices para controle da fila
+    int filaLinha[TAM_FILA], filaColuna[TAM_FILA];
+    int inicioFila = 0, fimFila = 0;
 
-    filaLinha[fimFila] = linhaInicial; // adiciona posição inicial à fila
+    filaLinha[fimFila] = linhaInicial; 
     filaColuna[fimFila] = colunaInicial;
-    fimFila++; // incrementa fim da fila
+    fimFila++;
 
     while (inicioFila < fimFila) { 
 
-        int linhaAtual = filaLinha[inicioFila]; // obtém posição atual da fila
+        int linhaAtual = filaLinha[inicioFila];
         int colunaAtual = filaColuna[inicioFila];
-        inicioFila++; // incrementa início da fila
+        inicioFila++;
 
-        for (int i = 0; i < 8; i++) { // para cada movimento possível
+        for (int i = 0; i < 8; i++) {
 
-            int novaLinha = linhaAtual + movimentoLinha[i]; // calcula nova posição
+            int novaLinha = linhaAtual + movimentoLinha[i];
             int novaColuna = colunaAtual + movimentoColuna[i];
 
             if (novaLinha >= 0 && novaLinha < ROW && novaColuna >= 0 && novaColuna < COL) { // verifica se nova posição está dentro dos limites da matriz
@@ -68,18 +114,12 @@ void propagar(int linhaInicial, int colunaInicial) {
                     }
                 }
 
-                // se a nova posicao for destino, marca o caminho e termina a propagação
-                if (novaLinha == linhaDestino && novaColuna == colunaDestino) { 
+                // atualiza apenas células livres ainda não visitadas
+                if (grid[novaLinha][novaColuna] == 0 && dist[novaLinha][novaColuna] == -1) {
 
-                    grid[novaLinha][novaColuna] = grid[linhaAtual][colunaAtual] + 1; 
-
-                    return;
-                }
-
-                // se for caminho válido (valor 0), marca a nova posição com o valor do caminho e adiciona à fila para continuar a propagação
-                if (grid[novaLinha][novaColuna] == 0) {
-
-                    grid[novaLinha][novaColuna] = grid[linhaAtual][colunaAtual] + 1;
+                    dist[novaLinha][novaColuna] = dist[linhaAtual][colunaAtual] + 1;
+                    paiLinha[novaLinha][novaColuna] = linhaAtual;
+                    paiColuna[novaLinha][novaColuna] = colunaAtual;
 
                     filaLinha[fimFila] = novaLinha; 
                     filaColuna[fimFila] = novaColuna;
@@ -88,62 +128,32 @@ void propagar(int linhaInicial, int colunaInicial) {
             }
         }
     }
+
+    return dist[linhaDestino][colunaDestino] != -1;
 }
 
 // reconstruir caminho
 void reconstruir() {
 
-    // começa do destino e vai para o início, escolhendo a posição com o menor valor a cada passo
     int linhaAtual = linhaDestino; 
     int colunaAtual = colunaDestino;
 
     printf("\nCaminho encontrado:\n");
 
-    // enquanto não chegar ao início (valor 1), continua procurando o próximo passo
-    while (grid[linhaAtual][colunaAtual] != 1) { 
+    while (!(linhaAtual == linhaOrigem && colunaAtual == colunaOrigem)) {
 
         printf("(%d, %d)\n", linhaAtual, colunaAtual);
 
-        int menorValor = grid[linhaAtual][colunaAtual];
-        int melhorLinha = linhaAtual; 
-        int melhorColuna = colunaAtual;
+        int proxLinha = paiLinha[linhaAtual][colunaAtual];
+        int proxColuna = paiColuna[linhaAtual][colunaAtual];
 
-        int encontrou = 0; 
-
-        // verifica os 8 movimentos possíveis para encontrar o próximo passo com o menor valor
-        for (int i = 0; i < 8; i++) { 
-
-            int novaLinha = linhaAtual + movimentoLinha[i];
-            int novaColuna = colunaAtual + movimentoColuna[i];
-
-            if (novaLinha >= 0 && novaLinha < ROW && novaColuna >= 0 && novaColuna < COL) {
-
-                // mesma regra da diagonal
-                if (movimentoLinha[i] != 0 && movimentoColuna[i] != 0) {
-                    if (grid[linhaAtual][novaColuna] == -1 ||
-                        grid[novaLinha][colunaAtual] == -1) {
-                        continue;
-                    }
-                }
-                
-                // se encontrar um valor menor, atualiza o melhor caminho
-                if (grid[novaLinha][novaColuna] > 0 && grid[novaLinha][novaColuna] < menorValor) {
-
-                    menorValor = grid[novaLinha][novaColuna];
-                    melhorLinha = novaLinha;
-                    melhorColuna = novaColuna;
-                    encontrou = 1;
-                }
-            }
-        }
-
-        if (!encontrou) {
+        if (proxLinha == -1 || proxColuna == -1) {
             printf("Erro: caminho não encontrado!\n");
             return;
         }
 
-        linhaAtual = melhorLinha;
-        colunaAtual = melhorColuna;
+        linhaAtual = proxLinha;
+        colunaAtual = proxColuna;
     }
 
     printf("(%d, %d)\n", linhaAtual, colunaAtual);
@@ -156,19 +166,32 @@ void imprimirGrid() {
 
     for (int i = 0; i < ROW; i++) { 
         for (int j = 0; j < COL; j++) { 
-            printf("%3d ", grid[i][j]);
+            if (grid[i][j] == -1) {
+                printf("%3d ", -1);
+            } else {
+                printf("%3d ", dist[i][j]);
+            }
         }
         printf("\n");
     }
 }
 
-int main() {
-
+int executarBusca() {
     int linhaInicial, colunaInicial;
+
+    if (!validarPontos()) {
+        return 1;
+    }
+
+    prepararBusca();
 
     encontrarInicio(&linhaInicial, &colunaInicial);
 
-    propagar(linhaInicial, colunaInicial);
+    if (!propagar(linhaInicial, colunaInicial)) {
+        imprimirGrid();
+        printf("\nNao existe caminho entre origem e destino.\n");
+        return 1;
+    }
 
     imprimirGrid();
 
@@ -176,3 +199,9 @@ int main() {
 
     return 0;
 }
+
+#ifndef ASTAR_NO_MAIN
+int main() {
+    return executarBusca();
+}
+#endif
