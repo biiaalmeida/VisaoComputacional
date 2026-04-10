@@ -1,23 +1,29 @@
 #include <stdio.h>
 
 #define ROW 10
-#define COL 5
+#define COL 10
 #define TAM_FILA (ROW * COL)
 
+//mudanças: definir uma matriz 10x10 
+//próximo passo: considerar o robô como um circulo com raio de 1 célula
+//pré-processar o mapa, aumentando o tamanho dos obstráculos com base no raio do robô, para garantir que o caminho gerado seja realmente viável para o robô circular.
 int grid[ROW][COL] = {
-    { 0,  0,  0,  0,  0},
-    { 0, -1, -1,  0,  0},
-    { 0,  0,  0, -1,  0},
-    { 0, -1,  0,  0,  0},
-    { 0, -1,  0, -1,  0},
-    { 0,  0,  0, -1,  0},
-    {-1, -1,  0,  0,  0},
-    { 0,  0,  0, -1,  0},
-    { 0, -1,  0,  0,  0},
-    { 0,  0,  0,  0,  0}
+    {  0,  0,  0,  0,  0,  0, -1,  0,  0,  0 },
+    {  0, -1, -1,  0,  0,  0, -1,  0, -1,  0 },
+    {  0,  0,  0, -1,  0,  0,  0,  0, -1,  0 },
+    {  0, -1,  0,  0,  0, -1, -1,  0,  0,  0 },
+    {  0, -1,  0, -1,  0,  0,  0, -1,  0,  0 },
+    {  0,  0,  0, -1,  0, -1,  0, -1,  0,  0 },
+    { -1, -1,  0,  0,  0,  0,  0,  0, -1,  0 },
+    {  0,  0,  0, -1,  0, -1, -1,  0,  0,  0 },
+    {  0, -1,  0,  0,  0,  0,  0, -1,  0,  0 },
+    {  0,  0,  0,  0,  0, -1,  0,  0,  0,  0 }
 };
 
-// definir origem e destino explicitamente
+//petrucio pediu para gerar um teste deixando a origem e destino fixo de forma aletória.
+//terá que dividir a matriz em quadrantes e o teste vai escolher um ponto aleatório em um quadrante para 
+//origem e outro ponto aleatório em outro quadrante para destino.
+//tem que testar a propagação direitinho em cada quadrante, para garantir que o algoritmo está funcionando corretamente em todas as partes da matriz.
 int linhaOrigem = 4;
 int colunaOrigem = 2;
 int linhaDestino = 0;

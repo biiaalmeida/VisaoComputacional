@@ -3,7 +3,7 @@ CFLAGS = -Wall -Wextra -std=c11
 
 .PHONY: all run test clean
 
-all: astar
+all: astar astar_teste
 
 astar: astar.c
 	$(CC) $(CFLAGS) astar.c -o astar
@@ -11,11 +11,11 @@ astar: astar.c
 run: astar
 	./astar
 
-test: astar_tests
-	./astar_tests
+test: astar_teste
+	./astar_teste
 
-astar_tests: astar_tests.c
-	$(CC) $(CFLAGS) astar_tests.c -o astar_tests
+astar_teste: astar_teste.c
+	$(CC) $(CFLAGS) astar_teste.c -o astar_teste
 
 clean:
-	rm -f astar astar_tests main
+	rm -f astar astar_teste main
