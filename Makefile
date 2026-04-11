@@ -5,8 +5,8 @@ CFLAGS = -Wall -Wextra -std=c11
 
 all: astar astar_teste
 
-astar: astar.c
-	$(CC) $(CFLAGS) astar.c -o astar
+astar: astar.c mapa_preprocessamento.c
+	$(CC) $(CFLAGS) astar.c mapa_preprocessamento.c -o astar
 
 run: astar
 	./astar
@@ -14,8 +14,8 @@ run: astar
 test: astar_teste
 	./astar_teste
 
-astar_teste: astar_teste.c
-	$(CC) $(CFLAGS) astar_teste.c -o astar_teste
+astar_teste: astar_teste.c mapa_preprocessamento.c
+	$(CC) $(CFLAGS) astar_teste.c mapa_preprocessamento.c -o astar_teste
 
 clean:
 	rm -f astar astar_teste main
