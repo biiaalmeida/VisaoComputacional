@@ -3,31 +3,37 @@
 #define ROW 10
 #define COL 10
 #define TAM_FILA (ROW * COL)
+#define RAIO_ROBO 1
 
-//mudanças: definir uma matriz 10x10 
-//próximo passo: considerar o robô como um circulo com raio de 1 célula
-//pré-processar o mapa, aumentando o tamanho dos obstráculos com base no raio do robô, para garantir que o caminho gerado seja realmente viável para o robô circular.
+int preprocessarMapaRoboQuadrado(
+    int linhas,
+    int colunas,
+    const int mapaOriginal[linhas][colunas],
+    int mapaProcessado[linhas][colunas],
+    int raioRobo
+);
+
 int grid[ROW][COL] = {
-    {  0,  0,  0,  0,  0,  0, -1,  0,  0,  0 },
-    {  0, -1, -1,  0,  0,  0, -1,  0, -1,  0 },
-    {  0,  0,  0, -1,  0,  0,  0,  0, -1,  0 },
-    {  0, -1,  0,  0,  0, -1, -1,  0,  0,  0 },
-    {  0, -1,  0, -1,  0,  0,  0, -1,  0,  0 },
-    {  0,  0,  0, -1,  0, -1,  0, -1,  0,  0 },
-    { -1, -1,  0,  0,  0,  0,  0,  0, -1,  0 },
-    {  0,  0,  0, -1,  0, -1, -1,  0,  0,  0 },
-    {  0, -1,  0,  0,  0,  0,  0, -1,  0,  0 },
-    {  0,  0,  0,  0,  0, -1,  0,  0,  0,  0 }
+    {  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
+    {  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
+    {  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
+    {  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
+    {  0,  0,  0,  0, -1, -1,  0,  0,  0,  0 },
+    {  0,  0,  0,  0, -1, -1,  0,  0,  0,  0 },
+    {  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
+    {  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
+    {  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
+    {  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 }
 };
 
-//petrucio pediu para gerar um teste deixando a origem e destino fixo de forma aletória.
-//terá que dividir a matriz em quadrantes e o teste vai escolher um ponto aleatório em um quadrante para 
-//origem e outro ponto aleatório em outro quadrante para destino.
-//tem que testar a propagação direitinho em cada quadrante, para garantir que o algoritmo está funcionando corretamente em todas as partes da matriz.
-int linhaOrigem = 4;
-int colunaOrigem = 2;
-int linhaDestino = 0;
-int colunaDestino = 0;
+int gridProcessado[ROW][COL];
+int (*mapaBusca)[COL] = grid;
+
+// pontos de origem e destino
+int linhaOrigem = 0;
+int colunaOrigem = 0;
+int linhaDestino = 9;
+int colunaDestino = 9;
 
 int dist[ROW][COL];
 int paiLinha[ROW][COL];
@@ -50,12 +56,12 @@ int validarPontos() {
         return 0;
     }
 
-    if (grid[linhaOrigem][colunaOrigem] == -1) {
+    if (mapaBusca[linhaOrigem][colunaOrigem] == -1) {
         printf("Erro: origem está sobre um obstáculo.\n");
         return 0;
     }
 
-    if (grid[linhaDestino][colunaDestino] == -1) {
+    if (mapaBusca[linhaDestino][colunaDestino] == -1) {
         printf("Erro: destino está sobre um obstáculo.\n");
         return 0;
     }
@@ -114,14 +120,14 @@ int propagar(int linhaInicial, int colunaInicial) {
 
                 // impedir diagonal atravessando obstáculo (se for movimento diagonal, verifica se há obstáculos nas posições adjacentes)
                 if (movimentoLinha[i] != 0 && movimentoColuna[i] != 0) { 
-                    if (grid[linhaAtual][novaColuna] == -1 || 
-                        grid[novaLinha][colunaAtual] == -1) {
+                    if (mapaBusca[linhaAtual][novaColuna] == -1 || 
+                        mapaBusca[novaLinha][colunaAtual] == -1) {
                         continue;
                     }
                 }
 
                 // atualiza apenas células livres ainda não visitadas
-                if (grid[novaLinha][novaColuna] == 0 && dist[novaLinha][novaColuna] == -1) {
+                if (mapaBusca[novaLinha][novaColuna] == 0 && dist[novaLinha][novaColuna] == -1) {
 
                     dist[novaLinha][novaColuna] = dist[linhaAtual][colunaAtual] + 1;
                     paiLinha[novaLinha][novaColuna] = linhaAtual;
@@ -172,7 +178,7 @@ void imprimirGrid() {
 
     for (int i = 0; i < ROW; i++) { 
         for (int j = 0; j < COL; j++) { 
-            if (grid[i][j] == -1) {
+            if (mapaBusca[i][j] == -1) {
                 printf("%3d ", -1);
             } else {
                 printf("%3d ", dist[i][j]);
@@ -182,8 +188,29 @@ void imprimirGrid() {
     }
 }
 
+void imprimirMapaProcessado() {
+
+    printf("\nMapa preprocessado (0 = livre, -1 = obstaculo):\n");
+
+    for (int i = 0; i < ROW; i++) {
+        for (int j = 0; j < COL; j++) {
+            printf("%3d ", mapaBusca[i][j]);
+        }
+        printf("\n");
+    }
+}
+
 int executarBusca() {
     int linhaInicial, colunaInicial;
+
+    if (!preprocessarMapaRoboQuadrado(ROW, COL, grid, gridProcessado, RAIO_ROBO)) {
+        printf("Erro ao pré-processar o mapa.\n");
+        return 1;
+    }
+
+    mapaBusca = gridProcessado;
+
+    imprimirMapaProcessado();
 
     if (!validarPontos()) {
         return 1;
