@@ -3,6 +3,7 @@
 #define CELULA_LIVRE 0
 #define CELULA_OBSTACULO -1
 
+// função para verificar se uma posição está dentro dos limites do mapa
 static int dentroDosLimites(int linhas, int colunas, int linha, int coluna) {
     return linha >= 0 && linha < linhas && coluna >= 0 && coluna < colunas;
 }

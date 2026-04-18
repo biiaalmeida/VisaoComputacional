@@ -3,7 +3,7 @@
 #define ROW 10
 #define COL 10
 #define TAM_FILA (ROW * COL)
-#define RAIO_ROBO 1
+#define RAIO_ROBO 2
 
 int preprocessarMapaRoboQuadrado(
     int linhas,
@@ -14,7 +14,7 @@ int preprocessarMapaRoboQuadrado(
 );
 
 int grid[ROW][COL] = {
-    {  0,  0,  0,  0,  0,  0,  0,  0,  0, -1},
+    {  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
     {  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
     {  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
     {  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
@@ -23,9 +23,10 @@ int grid[ROW][COL] = {
     {  0,  0,  0,  0,  0, -1,  0,  0,  0,  0 },
     {  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
     {  0,  0,  0,  0,  0, -1,  0,  0,  0,  0 },
-    { -1,  0,  0,  0,  0,  0,  0,  0,  0,  0 }
+    {  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 }
 };
 
+// mapa processado considerando o tamanho do robô
 int gridProcessado[ROW][COL];
 int (*mapaBusca)[COL] = grid;
 
@@ -35,6 +36,7 @@ int colunaOrigem = 0;
 int linhaDestino = 9;
 int colunaDestino = 9;
 
+// estruturas para busca
 int dist[ROW][COL];
 int paiLinha[ROW][COL];
 int paiColuna[ROW][COL];
@@ -188,6 +190,7 @@ void imprimirGrid() {
     }
 }
 
+// imprimir mapa processado
 void imprimirMapaProcessado() {
 
     printf("\nMapa preprocessado (0 = livre, -1 = obstaculo):\n");
@@ -200,6 +203,52 @@ void imprimirMapaProcessado() {
     }
 }
 
+// imprimir caminho em matriz visual (-1 obstaculo, 0 livre, 1..N caminho)
+void imprimirCaminhoVisual() {
+
+    int visual[ROW][COL];
+
+    // base visual: obstaculos = -1, livre = 0
+    for (int i = 0; i < ROW; i++) {
+        for (int j = 0; j < COL; j++) {
+            visual[i][j] = (mapaBusca[i][j] == -1) ? -1 : 0;
+        }
+    }
+
+    int linhaAtual = linhaDestino;
+    int colunaAtual = colunaDestino;
+
+    while (1) {
+        // usa a distancia da propagacao para numerar o caminho em 1..N
+        visual[linhaAtual][colunaAtual] = dist[linhaAtual][colunaAtual] + 1;
+
+        if (linhaAtual == linhaOrigem && colunaAtual == colunaOrigem) {
+            break;
+        }
+
+        int proxLinha = paiLinha[linhaAtual][colunaAtual];
+        int proxColuna = paiColuna[linhaAtual][colunaAtual];
+
+        if (proxLinha == -1 || proxColuna == -1) {
+            printf("Erro: caminho nao encontrado para visualizacao!\n");
+            return;
+        }
+
+        linhaAtual = proxLinha;
+        colunaAtual = proxColuna;
+    }
+
+    printf("\nMatriz do caminho (-1 obstaculo, 0 livre, 1..N caminho):\n");
+
+    for (int i = 0; i < ROW; i++) {
+        for (int j = 0; j < COL; j++) {
+            printf("%3d ", visual[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+// função principal para executar a busca
 int executarBusca() {
     int linhaInicial, colunaInicial;
 
@@ -226,9 +275,7 @@ int executarBusca() {
         return 1;
     }
 
-    imprimirGrid();
-
-    reconstruir();
+    imprimirCaminhoVisual();
 
     return 0;
 }
