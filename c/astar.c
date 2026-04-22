@@ -193,7 +193,7 @@ void imprimirGrid() {
 // imprimir mapa processado
 void imprimirMapaProcessado() {
 
-    printf("\nMapa preprocessado (0 = livre, -1 = obstaculo):\n");
+    printf("\nMapa preprocessado\n");
 
     for (int i = 0; i < ROW; i++) {
         for (int j = 0; j < COL; j++) {
@@ -238,7 +238,7 @@ void imprimirCaminhoVisual() {
         colunaAtual = proxColuna;
     }
 
-    printf("\nMatriz do caminho (-1 obstaculo, 0 livre, 1..N caminho):\n");
+    printf("\nMatriz do caminho\n");
 
     for (int i = 0; i < ROW; i++) {
         for (int j = 0; j < COL; j++) {
