@@ -6,7 +6,7 @@ ASTAR_SRC = $(SRC_DIR)/astar.c
 TEST_SRC = $(SRC_DIR)/astar_teste.c
 MAPA_SRC = $(SRC_DIR)/mapa_preprocessamento.c
 
-.PHONY: all run test clean
+.PHONY: all run test clean activate
 
 all: astar astar_teste
 
@@ -21,6 +21,9 @@ test: astar_teste
 
 astar_teste: $(TEST_SRC) $(ASTAR_SRC) $(MAPA_SRC)
 	$(CC) $(CFLAGS) $(TEST_SRC) $(MAPA_SRC) -o $@
+
+activate:
+	@echo "source python/venv/bin/activate"
 
 clean:
 	rm -f astar astar_teste main
