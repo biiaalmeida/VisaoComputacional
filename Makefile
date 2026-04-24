@@ -31,5 +31,11 @@ venv-check:
 run-image:
 	@.venv/bin/python python/src/gerarimagem.py
 
+procmapareal: 
+	@.venv/bin/python python/src/preprocessar_mapa_real.py
+
+procmapasimulado: 
+	@.venv/bin/python python/src/preprocessar_mapa.py
+
 clean:
 	rm -f astar astar_teste main
