@@ -6,6 +6,12 @@ ROOT_DIR = Path(__file__).resolve().parents[2]
 INPUT_IMAGE = ROOT_DIR / "python" / "imagens" / "mapa1.png"
 OUTPUT_DIR = ROOT_DIR / "dados"
 OUTPUT_DIR.mkdir(exist_ok=True)
+CROP_DIR = OUTPUT_DIR / "crop"
+MAPA_BINARIO_DIR = OUTPUT_DIR / "mapabinario"
+PREVIEW_DIR = OUTPUT_DIR / "preview"
+CROP_DIR.mkdir(exist_ok=True)
+MAPA_BINARIO_DIR.mkdir(exist_ok=True)
+PREVIEW_DIR.mkdir(exist_ok=True)
 
 # Leitura da imagem em uma variavel (escala de cinza).
 img = cv2.imread(str(INPUT_IMAGE), cv2.IMREAD_GRAYSCALE)
@@ -35,10 +41,12 @@ vmax = int(cropped_img.max())
 mapa = np.where((img >= vmin) & (img <= vmax), 0, -1).astype(np.int8)
 
 # Salva mapa numerico e preview visual (livre=branco, obstaculo=preto).
-np.savetxt(OUTPUT_DIR / "mapa_binario.txt", mapa, fmt="%d")
+np.savetxt(MAPA_BINARIO_DIR / "mapa_binario.txt", mapa, fmt="%d")
 preview = np.where(mapa == 0, 255, 0).astype(np.uint8)
-cv2.imwrite(str(OUTPUT_DIR / "mapa_binario_preview.png"), preview)
+cv2.imwrite(str(PREVIEW_DIR / "mapa_binario_preview.png"), preview)
+cv2.imwrite(str(CROP_DIR / "mapa_roi_processada.png"), cropped_img)
 
 print(f"Limiar do terreno: min={vmin}, max={vmax}")
-print(f"Mapa salvo em {OUTPUT_DIR / 'mapa_binario.txt'}")
-print(f"Preview salvo em {OUTPUT_DIR / 'mapa_binario_preview.png'}")
+print(f"Mapa salvo em {MAPA_BINARIO_DIR / 'mapa_binario.txt'}")
+print(f"Preview salvo em {PREVIEW_DIR / 'mapa_binario_preview.png'}")
+print(f"ROI processada salva em {CROP_DIR / 'mapa_roi_processada.png'}")
